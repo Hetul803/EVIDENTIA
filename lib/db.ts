@@ -1,15 +1,16 @@
-type PrismaClientType = unknown;
+import type { PrismaClient } from "@prisma/client";
+
+type PrismaClientType = PrismaClient;
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClientType };
 
-export async function getPrisma(): Promise<any | null> {
+export async function getPrisma(): Promise<PrismaClientType | null> {
   if (!process.env.DATABASE_URL) return null;
 
-  if (globalForPrisma.prisma) return globalForPrisma.prisma as any;
+  if (globalForPrisma.prisma) return globalForPrisma.prisma;
 
   const mod = await import("@prisma/client");
-  const PrismaClient = (mod as any).PrismaClient as new () => any;
-  const client = new PrismaClient();
+  const client = new mod.PrismaClient();
 
   if (process.env.NODE_ENV !== "production") {
     globalForPrisma.prisma = client;

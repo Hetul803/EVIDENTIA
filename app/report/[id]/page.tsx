@@ -97,7 +97,7 @@ export default function ReportPage() {
     return `Evidentia Truth Report (${safeId})`;
   }, [id]);
 
-  const downloadPdf = () => {
+  const downloadPdf = useCallback(() => {
     if (!report) return;
     const html = pdfRootRef.current?.innerHTML;
     if (!html) return;
@@ -141,7 +141,7 @@ export default function ReportPage() {
   </body>
 </html>`);
     w.document.close();
-  };
+  }, [report, pdfTitle]);
 
   useEffect(() => {
     const shouldPrint = searchParams.get("print") === "1";
@@ -150,7 +150,7 @@ export default function ReportPage() {
     if (autoPrintedRef.current) return;
     autoPrintedRef.current = true;
     downloadPdf();
-  }, [searchParams, report, loading]);
+  }, [searchParams, report, loading, downloadPdf]);
 
   if (loading) {
     return (
