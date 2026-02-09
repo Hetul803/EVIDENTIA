@@ -1,0 +1,44 @@
+// Evidentia - Truth Engine
+// SQLite for local/dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Report {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  title       String    @default("Truth Report")
+  verdict     String
+  confidence  Int
+  json        String    // full report JSON
+  shareId     String    @unique
+  mode        String    @default("normal") // normal | demo | adversarial
+  inputsMeta  String?   // JSON of input metadata
+  evidence    Evidence[]
+}
+
+model Evidence {
+  id           String   @id @default(cuid())
+  reportId     String
+  report       Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  type         String   // text | link | pdf | image | audio | video
+  filename     String?
+  url          String?
+  extractedText String?
+  mediaPaths   String?  // JSON array of paths
+  createdAt    DateTime @default(now())
+}
+
+model DemoScenario {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  payload     String   // JSON of preloaded inputs
+  tags        String?  // comma-separated
+}
