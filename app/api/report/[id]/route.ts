@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const prisma = await getPrisma();
+  if (!prisma) {
+    return NextResponse.json({ error: "Report not found" }, { status: 404 });
+  }
   const isShareId = id.length <= 12 && !id.includes("-");
   const report = isShareId
     ? await prisma.report.findUnique({ where: { shareId: id } })
